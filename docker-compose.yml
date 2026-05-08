@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_BASE44_APP_ID: ${VITE_BASE44_APP_ID:-}
+        VITE_BASE44_APP_BASE_URL: ${VITE_BASE44_APP_BASE_URL:-}
+        VITE_BASE44_FUNCTIONS_VERSION: ${VITE_BASE44_FUNCTIONS_VERSION:-}
+    # Match host nginx: proxy_pass http://127.0.0.1:<HOST_PORT>;
+    # Default binds loopback only (not public). For LAN testing use HOST_BIND=0.0.0.0
+    ports:
+      - "${HOST_BIND:-127.0.0.1}:${HOST_PORT:-8084}:80"

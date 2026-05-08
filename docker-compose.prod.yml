@@ -1,0 +1,28 @@
+# Production overlay — merge with the base file:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d --build
+#
+# On the VPS, point nginx at the same host port as HOST_PORT (default 8084), e.g. next to statista (8083):
+#
+#   location / {
+#     proxy_pass http://127.0.0.1:8084;
+#     proxy_http_version 1.1;
+#     proxy_set_header Host $host;
+#     proxy_set_header X-Real-IP $remote_addr;
+#     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+#     proxy_set_header X-Forwarded-Proto $scheme;
+#   }
+#
+# Use a dedicated env file (or CI secrets) for VITE_* build args; do not commit real values.
+# For a pre-built image from a registry, replace the `web.build` section in a local override
+# with `image: your-registry/jovan-functional-performance:tag` and drop --build.
+
+services:
+  web:
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
